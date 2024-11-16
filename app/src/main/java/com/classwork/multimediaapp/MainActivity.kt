@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,12 +33,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.classwork.multimediaapp.ui.theme.MultimediaAppTheme
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -54,10 +62,11 @@ fun Screen(modifier: Modifier = Modifier) {
     val drawerState = rememberDrawerState(
         initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
 
     ModalNavigationDrawer(drawerContent = {
         ModalDrawerSheet {
-            DrawerContent()
+            DrawerContent(navController = navController)
         }
     }, drawerState = drawerState)
     {
@@ -74,13 +83,28 @@ fun Screen(modifier: Modifier = Modifier) {
                 )
             }
         ) { padding ->
-            ScreenContent(modifier = Modifier.padding(padding))
+            Box(modifier = Modifier.padding(padding)) {
+                NavHost(navController = navController, startDestination = "broadcast_receiver") {
+                    composable("broadcast_receiver") { BroadCastScreen() }
+                    composable("image_scale") { ImageScaleScreen() }
+                    composable("video") { VideoScreen() }
+                    composable("audio") { AudioScreen() }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun DrawerContent(modifier: Modifier = Modifier) {
+fun DrawerContent(navController: NavController, modifier: Modifier = Modifier) {
+
+    // Observe the current back stack entry's route
+    val currentRouteState = navController.currentBackStackEntryFlow
+        .map { it.destination.route }
+        .collectAsState(initial = null)
+
+    val currentRoute = currentRouteState.value // Extract the value manually
+
     Text(
         text = "Multimedia App",
         fontSize = 24.sp,
@@ -101,8 +125,8 @@ fun DrawerContent(modifier: Modifier = Modifier) {
             text = "Broadcast Receiver",
             fontSize = 16.sp,
         ) },
-        selected = false,
-        onClick = { /*TODO*/ },
+        selected = currentRoute == "broadcast_receiver",
+        onClick = { navController.navigate("broadcast_receiver") },
     )
 
     Spacer(modifier = Modifier.height(6.dp))
@@ -118,8 +142,8 @@ fun DrawerContent(modifier: Modifier = Modifier) {
             text = "Image Scale",
             fontSize = 16.sp,
         ) },
-        selected = false,
-        onClick = { /*TODO*/ },
+        selected = currentRoute == "image_scale",
+        onClick = { navController.navigate("image_scale") },
     )
 
     Spacer(modifier = Modifier.height(6.dp))
@@ -135,8 +159,8 @@ fun DrawerContent(modifier: Modifier = Modifier) {
             text = "Video",
             fontSize = 16.sp,
         ) },
-        selected = true,
-        onClick = { /*TODO*/ },
+        selected = currentRoute == "video",
+        onClick = { navController.navigate("video") },
     )
 
     Spacer(modifier = Modifier.height(6.dp))
@@ -152,14 +176,17 @@ fun DrawerContent(modifier: Modifier = Modifier) {
             text = "Audio",
             fontSize = 16.sp,
         ) },
-        selected = false,
-        onClick = { /*TODO*/ },
+        selected = currentRoute == "audio",
+        onClick = { navController.navigate("audio") },
     )
 }
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
-
+    Box(modifier = modifier
+        .fillMaxSize()) {
+        BroadCastScreen()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
