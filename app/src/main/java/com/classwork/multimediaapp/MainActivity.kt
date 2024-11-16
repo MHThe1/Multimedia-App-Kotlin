@@ -85,7 +85,15 @@ fun Screen(modifier: Modifier = Modifier) {
         ) { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 NavHost(navController = navController, startDestination = "broadcast_receiver") {
-                    composable("broadcast_receiver") { BroadCastScreen() }
+                    composable("broadcast_receiver") { BroadCastScreen(navController) }
+                    composable("custom_receiver") { CustomReceiverScreen(navController) }
+                    composable("battery_receiver") { BatteryReceiverScreen() }
+                    composable("custom_receiver") {
+                        CustomReceiverScreen(navController)
+                    }
+                    composable("custom_receiver_result") {
+                        CustomReceiverResultScreen()
+                    }
                     composable("image_scale") { ImageScaleScreen() }
                     composable("video") { VideoScreen() }
                     composable("audio") { AudioScreen() }
@@ -179,14 +187,6 @@ fun DrawerContent(navController: NavController, modifier: Modifier = Modifier) {
         selected = currentRoute == "audio",
         onClick = { navController.navigate("audio") },
     )
-}
-
-@Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
-    Box(modifier = modifier
-        .fillMaxSize()) {
-        BroadCastScreen()
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
