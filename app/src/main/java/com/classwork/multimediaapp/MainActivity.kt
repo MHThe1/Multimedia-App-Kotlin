@@ -1,13 +1,13 @@
 package com.classwork.multimediaapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,9 +36,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,6 +59,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun Screen(modifier: Modifier = Modifier) {
     val drawerState = rememberDrawerState(
@@ -211,21 +214,41 @@ fun TopBar(onOpenDrawer: () -> Unit) {
             Text(text = "Multimedia App")
         },
         actions = {
+            val context = LocalContext.current
+            // Notifications Icon
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Menu",
+                contentDescription = "Notifications",
                 modifier = Modifier
                     .size(30.dp)
+                    .clickable {
+                        // Show toast for unavailable feature
+                        Toast.makeText(
+                            context,
+                            "Notifications are not available right now.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             )
+
+            // Add Circle Icon
             Icon(
                 imageVector = Icons.Default.AddCircle,
-                contentDescription = "Menu",
+                contentDescription = "Add New",
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
                     .size(30.dp)
+                    .clickable {
+                        // Show toast for unavailable feature
+                        Toast.makeText(
+                            context,
+                            "Adding new items is not available right now.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             )
         }
-        )
+    )
 }
 
 @Preview(showBackground = true)
